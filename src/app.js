@@ -3,16 +3,16 @@ const express = require("express");
 const app = express();
 
 // Request Handler
-app.use("/test", (req, res) => {
-  res.send("I'm listening on port 7777/test");
+app.get("/user", (req, res) => {
+  res.send({ firstName: "Syed Asad", lastName: "Hashmi" });
 });
 
-app.use("/hello", (req, res) => {
-  res.send("I'm listening on port 7777/hello");
+app.post("/user", (req, res) => {
+  res.send("Data Saved to DB Successfully");
 });
 
-app.use("/", (req, res) => {
-  res.send("I'm listening on port /");
+app.delete("/user", (req, res) => {
+  res.send("User data deleted");
 });
 
 app.listen(7777, () => {
