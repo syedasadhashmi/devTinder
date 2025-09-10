@@ -4,21 +4,21 @@ const { adminAuth, userAuth } = require("../src/middlewares/auth");
 
 const app = express();
 
-// Multiple Route Handler
-app.use("/admin", adminAuth);
+app.get("/getUserData", (req, res) => {
+  try {
+    throw new Error("djsakj");
+  } catch (error) {
+    res.status(500).send("something went wrong");
+  }
+  //
 
-app.use("/user/data", userAuth);
-
-app.get("/admin/data", (req, res) => {
-  res.send("Admin is here!  ");
+  // res.send("Data send");
 });
 
-app.get("/user/data", (req, res) => {
-  res.send("user is here!  ");
-});
-
-app.get("/user/login", (req, res) => {
-  res.send("Login");
+app.use("/", (err, req, res, next) => {
+  if (err) {
+    res.status(500).send("something went wrong");
+  }
 });
 
 app.listen(7777, () => {
