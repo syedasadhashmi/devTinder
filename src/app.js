@@ -19,7 +19,7 @@ app.post("/signup", async (req, res) => {
     await user.save();
     res.send("user created succesfully");
   } catch (err) {
-    res.status(400).send("Error saving the user ", err.message);
+    res.status(400).send(err.message);
   }
 });
 
@@ -97,6 +97,7 @@ app.patch("/user", async (req, res) => {
   try {
     const users = await User.findOneAndUpdate({ _id: userId }, data, {
       returnDocument: "after",
+      runValidators: true,
     });
     if (!users) {
       res.status(404).send("User Not Found");
@@ -104,7 +105,7 @@ app.patch("/user", async (req, res) => {
       res.send("User Updated");
     }
   } catch (err) {
-    res.send(400).send("Something went wrong");
+    res.status(400).send("Something went wrong");
   }
 });
 
@@ -117,6 +118,7 @@ app.patch("/userEmail", async (req, res) => {
   try {
     const users = await User.findOneAndUpdate({ email: userEmail }, data, {
       returnDocument: "after",
+      runValidators: true,
     });
     console.log(users);
     if (!users) {
@@ -125,7 +127,7 @@ app.patch("/userEmail", async (req, res) => {
       res.send(users);
     }
   } catch (err) {
-    res.send(400).send("Something went wrong");
+    res.status(400).send("Something went wrong");
   }
 });
 
