@@ -72,6 +72,63 @@ app.get("/findById", async (req, res) => {
   }
 });
 
+// Delete user by id
+app.delete("/user", async (req, res) => {
+  const userId = req.body._id;
+  // console.log(users);
+
+  try {
+    const users = await User.findByIdAndDelete(userId);
+    if (!users) {
+      res.status(404).send("No User Found");
+    } else {
+      res.send("User Deleted");
+    }
+  } catch (err) {
+    res.status(400).send("Something went wrong");
+  }
+});
+
+// Find one via id
+app.patch("/user", async (req, res) => {
+  const userId = req.body._id;
+  const data = req.body;
+
+  try {
+    const users = await User.findOneAndUpdate({ _id: userId }, data, {
+      returnDocument: "after",
+    });
+    if (!users) {
+      res.status(404).send("User Not Found");
+    } else {
+      res.send("User Updated");
+    }
+  } catch (err) {
+    res.send(400).send("Something went wrong");
+  }
+});
+
+// Find one via email
+
+app.patch("/userEmail", async (req, res) => {
+  const userEmail = req.body.email;
+  const data = req.body;
+
+  try {
+    const users = await User.findOneAndUpdate({ email: userEmail }, data, {
+      returnDocument: "after",
+    });
+    console.log(users);
+    if (!users) {
+      res.status(404).send("User Not Found");
+    } else {
+      res.send(users);
+    }
+  } catch (err) {
+    res.send(400).send("Something went wrong");
+  }
+});
+
 connectDb()
   .then(() => {
     console.log("Data base connected succeafully");
