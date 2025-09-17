@@ -13,9 +13,50 @@ app.use(express.json());
 // SignUp
 app.post("/signup", async (req, res) => {
   // creating a new instance of user Model
-  const user = new User(req.body);
+  const user = new User(req?.body);
+  const data = req?.body;
 
   try {
+    const ALLOWED_UPDATES = [
+      "photoUrl",
+      "about",
+      "gender",
+      "age",
+      "skills",
+      "email",
+      "password",
+      "firstName",
+      "lastName",
+    ];
+    const isUpdateAllowed = Object.keys(data).every((e) => {
+      // console.log(e);
+      return ALLOWED_UPDATES.includes(e);
+    });
+
+    console.log(isUpdateAllowed);
+
+    if (!isUpdateAllowed) {
+      throw new Error("New Records were not entertain");
+    }
+    if (data?.skills?.length > 10) {
+      throw new Error("ten skills were allowed");
+    }
+
+    if (data?.about) {
+      const wordCount = data?.about?.trim()?.split(/\s+/)?.length;
+      console.log(wordCount);
+
+      if (wordCount > 250) {
+        throw new Error("You can use 250 words only!");
+      }
+    }
+
+    if (data?.photoUrl) {
+      const urlRegex = /^(https?:\/\/)([\w\-]+(\.[\w\-]+)+)(\/[^\s]*)?$/i;
+      if (!urlRegex.test(data?.photoUrl)) {
+        throw new Error("Photo url invalid must start with http or https");
+      }
+    }
     await user.save();
     res.send("user created succesfully");
   } catch (err) {
@@ -90,11 +131,44 @@ app.delete("/user", async (req, res) => {
 });
 
 // Find one via id
-app.patch("/user", async (req, res) => {
-  const userId = req.body._id;
+app.patch("/user/:userId", async (req, res) => {
+  const userId = req.params?.userId;
   const data = req.body;
+  console.log(userId);
 
   try {
+    const ALLOWED_UPDATES = ["photoUrl", "about", "gender", "age", "skills"];
+    const isUpdateAllowed = Object.keys(data).every((e) => {
+      // console.log(e);
+      return ALLOWED_UPDATES.includes(e);
+    });
+
+    console.log(isUpdateAllowed);
+
+    if (!isUpdateAllowed) {
+      throw new Error("Updates not allowed");
+    }
+
+    if (data?.skills?.length > 10) {
+      throw new Error("ten skills were allowed");
+    }
+
+    if (data?.about) {
+      const wordCount = data?.about?.trim().split(/\s+/)?.length;
+      console.log(wordCount);
+
+      if (wordCount > 250) {
+        throw new Error("You can use 250 words only!");
+      }
+    }
+
+    if (data?.photoUrl) {
+      const urlRegex = /^(https?:\/\/)([\w\-]+(\.[\w\-]+)+)(\/[^\s]*)?$/i;
+      if (!urlRegex.test(data?.photoUrl)) {
+        throw new Error("Photo url invalid must start with http or https");
+      }
+    }
+
     const users = await User.findOneAndUpdate({ _id: userId }, data, {
       returnDocument: "after",
       runValidators: true,
@@ -105,7 +179,7 @@ app.patch("/user", async (req, res) => {
       res.send("User Updated");
     }
   } catch (err) {
-    res.status(400).send("Something went wrong");
+    res.status(400).send(err.message);
   }
 });
 
