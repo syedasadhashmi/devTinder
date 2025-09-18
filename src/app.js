@@ -51,12 +51,12 @@ app.post("/signup", async (req, res) => {
       }
     }
 
-    if (data?.photoUrl) {
-      const urlRegex = /^(https?:\/\/)([\w\-]+(\.[\w\-]+)+)(\/[^\s]*)?$/i;
-      if (!urlRegex.test(data?.photoUrl)) {
-        throw new Error("Photo url invalid must start with http or https");
-      }
-    }
+    // if (data?.photoUrl) {
+    //   const urlRegex = /^(https?:\/\/)([\w\-]+(\.[\w\-]+)+)(\/[^\s]*)?$/i;
+    //   if (!urlRegex.test(data?.photoUrl)) {
+    //     throw new Error("Photo url invalid must start with http or https");
+    //   }
+    // }
     await user.save();
     res.send("user created succesfully");
   } catch (err) {
@@ -162,12 +162,12 @@ app.patch("/user/:userId", async (req, res) => {
       }
     }
 
-    if (data?.photoUrl) {
-      const urlRegex = /^(https?:\/\/)([\w\-]+(\.[\w\-]+)+)(\/[^\s]*)?$/i;
-      if (!urlRegex.test(data?.photoUrl)) {
-        throw new Error("Photo url invalid must start with http or https");
-      }
-    }
+    // if (data?.photoUrl) {
+    //   const urlRegex = /^(https?:\/\/)([\w\-]+(\.[\w\-]+)+)(\/[^\s]*)?$/i;
+    //   if (!urlRegex.test(data?.photoUrl)) {
+    //     throw new Error("Photo url invalid must start with http or https");
+    //   }
+    // }
 
     const users = await User.findOneAndUpdate({ _id: userId }, data, {
       returnDocument: "after",
