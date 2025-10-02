@@ -8,59 +8,60 @@ const app = express();
 
 const User = require("./models/user");
 
+const { validationSignUp } = require("./utils/validation");
+
+const bcrypt = require("bcrypt");
+
 app.use(express.json());
 
 // SignUp
 app.post("/signup", async (req, res) => {
   // creating a new instance of user Model
-  const user = new User(req?.body);
-  const data = req?.body;
 
   try {
-    const ALLOWED_UPDATES = [
-      "photoUrl",
-      "about",
-      "gender",
-      "age",
-      "skills",
-      "email",
-      "password",
-      "firstName",
-      "lastName",
-    ];
-    const isUpdateAllowed = Object.keys(data).every((e) => {
-      // console.log(e);
-      return ALLOWED_UPDATES.includes(e);
+    // validation
+    validationSignUp(req);
+
+    //Encript the password
+    const { password, email, firstName, lastName } = req?.body;
+    const passwordHash = await bcrypt.hash(password, 10);
+    console.log(passwordHash);
+
+    // Creating new instance of the user model
+    const user = new User({
+      email,
+      firstName,
+      lastName,
+      password: passwordHash,
     });
 
-    console.log(isUpdateAllowed);
-
-    if (!isUpdateAllowed) {
-      throw new Error("New Records were not entertain");
-    }
-    if (data?.skills?.length > 10) {
-      throw new Error("ten skills were allowed");
-    }
-
-    if (data?.about) {
-      const wordCount = data?.about?.trim()?.split(/\s+/)?.length;
-      console.log(wordCount);
-
-      if (wordCount > 250) {
-        throw new Error("You can use 250 words only!");
-      }
-    }
-
-    // if (data?.photoUrl) {
-    //   const urlRegex = /^(https?:\/\/)([\w\-]+(\.[\w\-]+)+)(\/[^\s]*)?$/i;
-    //   if (!urlRegex.test(data?.photoUrl)) {
-    //     throw new Error("Photo url invalid must start with http or https");
-    //   }
-    // }
     await user.save();
     res.send("user created succesfully");
   } catch (err) {
     res.status(400).send(err.message);
+  }
+});
+
+// Login
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req?.body;
+    const isEmailValid = await User.findOne({ email: email });
+    if (!isEmailValid) {
+      throw new Error("Invalid credentials");
+    }
+    const isPasswordValid = await bcrypt.compare(
+      password,
+      isEmailValid?.password
+    );
+
+    if (!isPasswordValid) {
+      throw new Error("Invalid credentials");
+    } else {
+      res.send("Login Successfully");
+    }
+  } catch (err) {
+    res.status(400).send("Error: " + err.message);
   }
 });
 
