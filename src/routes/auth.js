@@ -5,31 +5,6 @@ const bcrypt = require("bcrypt");
 const { validationSignUp } = require("../utils/validation");
 
 authRouter.post("/signup", async (req, res) => {
-  try {
-    // validation
-    validationSignUp(req);
-
-    //Encript the password
-    const { password, email, firstName, lastName } = req?.body;
-    const passwordHash = await bcrypt.hash(password, 10);
-    console.log(passwordHash);
-
-    // Creating new instance of the user model
-    const user = new User({
-      email,
-      firstName,
-      lastName,
-      password: passwordHash,
-    });
-
-    await user.save();
-    res.send("user created succesfully");
-  } catch (err) {
-    res.status(400).send(err.message);
-  }
-});
-
-authRouter.post("/signup", async (req, res) => {
   // creating a new instance of user Model
 
   try {
@@ -79,6 +54,17 @@ authRouter.post("/login", async (req, res) => {
   } catch (err) {
     res.status(400).send("Error: " + err.message);
   }
+});
+
+authRouter.post("/logout", async (req, res) => {
+  res.cookie(
+    "token",
+    {},
+    {
+      expires: new Date(Date.now()),
+    }
+  );
+  res.send("Logout Succesfull!!");
 });
 
 module.exports = authRouter;

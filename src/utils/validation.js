@@ -3,7 +3,6 @@ const validator = require("validator");
 const validationSignUp = (req) => {
   const { email, firstName, lastName, password, skills, about } = req?.body;
 
-  console.log(email);
   if (!validator.isStrongPassword(password)) {
     throw new Error("Password should be strong");
   } else if (!validator.isEmail(email)) {
@@ -19,6 +18,29 @@ const validationSignUp = (req) => {
   }
 };
 
+const updateValidation = (req) => {
+  const allowedEditFields = [
+    "firstName",
+    "lastName",
+    "gender",
+    "age",
+    "photoUrl",
+    "skills",
+    "about",
+  ];
+
+  const isEditAllowed = Object.keys(req.body).every((field) =>
+    allowedEditFields.includes(field)
+  );
+
+  if (!isEditAllowed) {
+    throw new Error("Not A Valid Field to Update");
+  }
+
+  return isEditAllowed;
+};
+
 module.exports = {
   validationSignUp,
+  updateValidation,
 };
