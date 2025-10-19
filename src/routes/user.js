@@ -27,7 +27,7 @@ userRouter.get("/user/requests/recieved", userAuth, async (req, res) => {
 });
 
 // Get All Connections (accepted) by  or off logged in user
-userRouter.get("/user/connection", userAuth, async (req, res) => {
+userRouter.get("/user/connections", userAuth, async (req, res) => {
   try {
     const loggedInUser = req.user;
 
