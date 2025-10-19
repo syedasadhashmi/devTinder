@@ -14,15 +14,18 @@
 
 ## connectionRequestRouter
 
-- POST/request/send/interested/:userId
-- POST/request/send/ignored/:userId
-- POST/request/review/accepted/:requestId
-- POST/request/review/rejected/:requestId
+<!-- From Senders Point of View statuses should be interested or ignored-->
+
+- POST/request/send/:status/:userId
+
+<!-- From Recievers Point Of view statuses should be accepted,rejected -->
+
+- POST/request/review/:status/:requestId
 
 ## userRouter
 
+- GET/user/requests/recieved
 - GET/user/connections
-- GET/user/request
 - GET/user/feed
 
-## Status: ignore, interested, accespted, rejected
+## Status: ignored, interested, accepted, rejected
