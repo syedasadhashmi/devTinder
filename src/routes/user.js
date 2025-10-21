@@ -3,7 +3,8 @@ const { userAuth } = require("../middlewares/auth");
 const userRouter = express.Router();
 const ConnectionRequest = require("../models/connectionRequest");
 const { populate } = require("../models/user");
-const SAVE_DATA = "firstName,lastName,gender,age,about,skills,photUrl";
+const SAVE_DATA = "firstName lastName gender age about skills photUrl";
+const User = require("../models/user");
 
 // Get all the pending connection request for the loggedIn User
 userRouter.get("/user/requests/recieved", userAuth, async (req, res) => {
@@ -19,6 +20,7 @@ userRouter.get("/user/requests/recieved", userAuth, async (req, res) => {
       "about",
       "gender",
       "age",
+      "photoUrl",
     ]);
     res.json({ message: "Data Fetched Succesfully", data: connectionRequests });
   } catch (err) {
@@ -44,6 +46,7 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
         "about",
         "gender",
         "age",
+        "photoUrl",
       ])
       .populate("toUserId", [
         "firstName",
@@ -52,6 +55,7 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
         "about",
         "gender",
         "age",
+        "photoUrl",
       ]);
 
     // const data = connectionRequests.map((row) => {
@@ -73,6 +77,42 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
     });
   } catch (err) {
     res.status(400).send({ message: err.message });
+  }
+});
+
+// Gets you the profiles of other users on platform
+userRouter.get("/user/feed", userAuth, async (req, res) => {
+  try {
+    const loggedInUser = req.user;
+
+    // for pagination
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const connectedUsers = await ConnectionRequest.find({
+      $or: [{ fromUserId: loggedInUser }, { toUserId: loggedInUser }],
+    }).select("fromUserId toUserId");
+
+    const hideUsers = new Set();
+    connectedUsers.forEach((req) => {
+      hideUsers.add(req.fromUserId.toString());
+      hideUsers.add(req.toUserId.toString());
+    });
+
+    const shownUsers = await User.find({
+      $and: [
+        { _id: { $nin: Array.from(hideUsers) } },
+        { _id: { $ne: loggedInUser._id } },
+      ],
+    })
+      .select(SAVE_DATA)
+      .skip(skip)
+      .limit(limit);
+
+    res.json({ message: "Data Fetched Successfully", data: shownUsers });
+  } catch (err) {
+    res.status(400).send({ message: "Error: " + err.message });
   }
 });
 
