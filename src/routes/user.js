@@ -3,7 +3,7 @@ const { userAuth } = require("../middlewares/auth");
 const userRouter = express.Router();
 const ConnectionRequest = require("../models/connectionRequest");
 const { populate } = require("../models/user");
-const SAVE_DATA = "firstName lastName gender age about skills photUrl";
+const SAVE_DATA = "firstName lastName gender age about skills photoUrl";
 const User = require("../models/user");
 
 // Get all the pending connection request for the loggedIn User
