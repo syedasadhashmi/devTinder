@@ -125,7 +125,19 @@ ec2-3-143-243-48.us-east-2.compute.amazonaws.com
 
 ssh -i "devTinder-secret.pem" ubuntu@ec2-3-143-243-48.us-east-2.compute.amazonaws.com
 
-install nvm
-install node same version as in local machine
-
---write keyword exit to logout from machine
+- install nvm
+- install node same version as in local machine
+- write keyword exit to logout from machine
+- git clone <project https link> frontend & backend
+- type ls to check the list in system
+- Frontend
+  - go to project
+  - install dependencies
+  - npm run build
+  - sudo apt update (to update project dependencies)
+  - sudo apt install nginx
+  - sudo systemctl start nginx
+  - sudo systemctl enable nginx
+  - copy code from dist(build files) to /var/www/html/
+  - sudo scp -r dist/\* /var/www/html/
+  - Enable port :80 on your instance
