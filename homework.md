@@ -110,3 +110,22 @@
 - What is the advantages and disadvantage of creating?
 - Read this arcticle about compond indexes - https://www.mongodb.com/docs/manual/core/indexes/index-types/index-compound/
 - ALWAYS THINK ABOUT CORNER CASES
+
+## Deployment On AWS
+
+Open an SSH client. (Run commands using git bash)
+
+Locate your private key file. The key used to launch this instance is devTinder-secret.pem
+
+Run this command, if necessary, to ensure your key is not publicly viewable.
+chmod 400 "devTinder-secret.pem"
+
+Connect to your instance using its Public DNS:
+ec2-3-143-243-48.us-east-2.compute.amazonaws.com
+
+ssh -i "devTinder-secret.pem" ubuntu@ec2-3-143-243-48.us-east-2.compute.amazonaws.com
+
+install nvm
+install node same version as in local machine
+
+--write keyword exit to logout from machine
