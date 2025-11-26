@@ -3,6 +3,7 @@ const requestRouter = exprees.Router();
 const { userAuth } = require("../middlewares/auth");
 const ConnectionRequest = require("../models/connectionRequest");
 const User = require("../models/user");
+const sendEmail = require("../utils/sendEmail");
 
 // Send Connection Request
 requestRouter.post(
@@ -42,12 +43,17 @@ requestRouter.post(
         status,
       });
       const data = await newConnectionRequest.save();
+
+      const emailRes = await sendEmail.run();
+      // console.log(emailRes);
+
       res.json({
         message:
           req.user.firstName + " is " + status + " in " + toUser.firstName,
         data,
       });
     } catch (err) {
+      // console.log(err);
       res.status(400).send("Error: " + err.message);
     }
   }

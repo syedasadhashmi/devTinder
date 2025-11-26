@@ -111,33 +111,93 @@
 - Read this arcticle about compond indexes - https://www.mongodb.com/docs/manual/core/indexes/index-types/index-compound/
 - ALWAYS THINK ABOUT CORNER CASES
 
-## Deployment On AWS
+# Deployment
 
-Open an SSH client. (Run commands using git bash)
+    - Signup on AWS
+    - Launch instance
+    - chmod 400 <secret>.pem
+    - ssh -i "devTinder-secret.pem" ubuntu@ec2-43-204-96-49.ap-south-1.compute.amazonaws.com
+    - Install Node version 16.17.0
+    - Git clone
+    - Frontend
+        - npm install  -> dependencies install
+        - npm run build
+        - sudo apt update
+        - sudo apt install nginx
+        - sudo systemctl start nginx
+        - sudo systemctl enable nginx
+        - Copy code from dist(build files) to /var/www/html/
+        - sudo scp -r dist/* /var/www/html/
+        - Enable port :80 of your instance
+    - Backend
+        - updated DB password
+        - allowed ec2 instance public IP on mongodb server
+        - npm intsall pm2 -g
+        - pm2 start npm --name "devTinder-backend" -- start
+        - pm2 logs
+        - pm2 list, pm2 flush <name> , pm2 stop <name>, pm2 delete <name>
+        - config nginx - /etc/nginx/sites-available/default
+        - restart nginx - sudo systemctl restart nginx
+        - Modify the BASEURL in frontend project to "/api"
 
-Locate your private key file. The key used to launch this instance is devTinder-secret.pem
+# Ngxinx config:
 
-Run this command, if necessary, to ensure your key is not publicly viewable.
-chmod 400 "devTinder-secret.pem"
+        Frontend = http://43.204.96.49/
+        Backend = http://43.204.96.49:7777/
 
-Connect to your instance using its Public DNS:
-ec2-3-143-243-48.us-east-2.compute.amazonaws.com
+        Domain name = devtinder.com => 43.204.96.49
 
-ssh -i "devTinder-secret.pem" ubuntu@ec2-3-143-243-48.us-east-2.compute.amazonaws.com
+        Frontend = devtinder.com
+        Backend = devtinder.com:7777 => devtinder.com/api
 
-- install nvm
-- install node same version as in local machine
-- write keyword exit to logout from machine
-- git clone <project https link> frontend & backend
-- type ls to check the list in system
-- Frontend
-  - go to project
-  - install dependencies
-  - npm run build
-  - sudo apt update (to update project dependencies)
-  - sudo apt install nginx
-  - sudo systemctl start nginx
-  - sudo systemctl enable nginx
-  - copy code from dist(build files) to /var/www/html/
-  - sudo scp -r dist/\* /var/www/html/
-  - Enable port :80 on your instance
+        nginx config :
+
+        server_name 43.204.96.49;
+
+        location /api/ {
+            proxy_pass http://localhost:7777/;  # Pass the request to the Node.js app
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection 'upgrade';
+            proxy_set_header Host $host;
+            proxy_cache_bypass $http_upgrade;
+        }
+
+# Addding a custom Domain name
+
+    - purchased domain name from godaddy
+    - signup on cloudflare & add a new domain name
+    - change the nameservers on godaddy and point it to cloudflare
+    - wait for sometime till your nameservers are updated ~15 minutes
+    - DNS record: A devtinder.in 43.204.96.49
+    - Enable SSL for website
+
+# Sending Emails via SES
+
+    - Create a IAM user
+    - Give Access to AmazonSESFullAccess
+    - Amazon SES: Create an Identity
+    - Verify your domain name
+    - Verify an email address identity
+    - Install AWS SDK - v3
+    - Code Example https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/ses#code-examples
+    - also require .env on sesClient because sometimes it didn't read
+    - Setup SesClient
+    - Access Credentials should be created in IAm under SecurityCredentials Tab
+    - Add the credentials to the env file
+    - Write code for SESClient
+    - Write code for Sending email address
+    - Make the email dynamic by passing more params to the run function
+
+# Scheduling cron jobs in NodeJS
+
+    - Installing node-cron
+    - Learning about cron expressions syntax - crontab.guru
+    - Schedule a job
+    - date-fns
+    - Find all the unique  email Id who have got connection Request in previous day
+    - Send Email
+    - Explore queue mechanim to send bulk emails
+    - Amazon SES Bulk Emails
+    - Make sendEmail function dynamic
+    - bee-queue & bull npm packages
