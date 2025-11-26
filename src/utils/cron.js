@@ -1,12 +1,13 @@
 const { subDays, startOfDay, endOfDay } = require("date-fns");
 const cron = require("node-cron");
 const ConnectionRequestModel = require("../models/connectionRequest");
+const sendEmail = require("./sendEmail");
 
 // This job is run 8am in the morning everyday
-cron.schedule("0 8 * * *", async () => {
+cron.schedule("1 8 * * *", async () => {
   // Send email to all people who got requests from previous day
   try {
-    const yesterday = subDays(new Date(), 0);
+    const yesterday = subDays(new Date(), 1);
 
     const yesterdayStart = startOfDay(yesterday);
     const yesterdayEnd = endOfDay(yesterday);
@@ -24,21 +25,21 @@ cron.schedule("0 8 * * *", async () => {
       ...new Set(pendingRequests.map((req) => req.toUserId.email)),
     ];
 
-    console.log(listOfEmails);
+    // console.log(listOfEmails);
     // Sending email
     // if there were so many emails create queues for that or use pacakage bequeue or bullmq
-    // for (const email of listOfEmails) {
-    //   try {
-    // sendEmail is a function created for sending email using ses from aws with params subject and body
-    //     const res = await SendEmail.run(
-    //       "new friend request pending for " + email,
-    //       "There are some friend request please login to devtinder.in to accept or reject it"
-    //     );
-    //     console.log(res);
-    //   } catch (err) {
-    //     console.log(err);
-    //   }
-    // }
+    for (const email of listOfEmails) {
+      try {
+        // sendEmail is a function created for sending email using ses from aws with params subject and body
+        const res = await sendEmail.run(
+          "new friend request pending for " + email,
+          "There are some friend request please login to syedasadhashmi.online to accept or reject it"
+        );
+        // console.log(res);
+      } catch (err) {
+        console.log(err);
+      }
+    }
   } catch (err) {
     console.log(err);
   }
